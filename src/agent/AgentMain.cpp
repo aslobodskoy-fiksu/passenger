@@ -36,6 +36,7 @@ int ustRouterMain(int argc, char *argv[]);
 int systemMetricsMain(int argc, char *argv[]);
 int tempDirToucherMain(int argc, char *argv[]);
 int spawnPreparerMain(int argc, char *argv[]);
+int printSchemasMain(int argc, char *argv[]);
 
 static bool
 isHelp(const char *arg) {
@@ -58,6 +59,7 @@ usage(int argc, char *argv[]) {
 	printf("\n");
 	printf("Utility subcommands:\n");
 	printf("  system-metrics\n");
+	printf("  print-schemas\n");
 }
 
 static bool
@@ -86,6 +88,8 @@ dispatchSubcommand(int argc, char *argv[]) {
 		exit(ustRouterMain(argc, argv));
 	} else if (strcmp(argv[1], "system-metrics") == 0) {
 		exit(systemMetricsMain(argc, argv));
+	} else if (strcmp(argv[1], "print-schemas") == 0) {
+		exit(printSchemasMain(argc, argv));
 	} else if (strcmp(argv[1], "temp-dir-toucher") == 0) {
 		exit(tempDirToucherMain(argc, argv));
 	} else if (strcmp(argv[1], "spawn-preparer") == 0) {

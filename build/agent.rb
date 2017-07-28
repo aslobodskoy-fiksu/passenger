@@ -33,6 +33,8 @@ AGENT_OBJECTS = {
     "src/agent/Watchdog/WatchdogMain.cpp",
   "#{AGENT_OUTPUT_DIR}CoreMain.o" =>
     "src/agent/Core/CoreMain.cpp",
+  "#{AGENT_OUTPUT_DIR}PrintSchemasMain.o" =>
+    "src/agent/PrintSchemas/PrintSchemasMain.cpp",
   "#{AGENT_OUTPUT_DIR}CoreApplicationPool.o" =>
     "src/agent/Core/ApplicationPool/Implementation.cpp",
   "#{AGENT_OUTPUT_DIR}CoreController.o" =>
@@ -100,4 +102,26 @@ end
 
 task 'common:clean' do
   sh "rm -rf #{AGENT_OUTPUT_DIR}"
+end
+
+desc 'Update PrintSchemasMain.cpp'
+task :print_schemas_main do
+  source = 'src/agent/PrintSchemas/PrintSchemasMain.cpp'
+  template = CxxCodeTemplateRenderer.new("#{source}.cxxcodebuilder")
+  template.render_to(source)
+end
+
+desc 'Update dev/configkit-schemas/index.json'
+task :configkit_schemas_index => [:print_schemas_main] do
+  # Prevent PrintSchemasMain.cpp from being updated while
+  # concurrently compiling PassengerAgent. This means that
+  # we can't run this task under 'drake', but c'est la vie.
+  Rake::Task[AGENT_TARGET].invoke
+
+  sh "#{AGENT_TARGET} print-schemas > dev/configkit-schemas/index.json"
+end
+
+desc 'Update ConfigKit schema inline comments'
+task :configkit_schemas_inline_comments => :configkit_schemas_index do
+  sh './dev/configkit-schemas/update_schema_inline_comments.rb'
 end
