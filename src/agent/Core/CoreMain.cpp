@@ -90,6 +90,7 @@
 #include <Core/OptionParser.h>
 #include <Core/Controller.h>
 #include <Core/ApiServer.h>
+#include <Core/Schema.h>
 #include <Core/ApplicationPool/Pool.h>
 #include <Core/UnionStation/Context.h>
 #include <Core/SecurityUpdateChecker.h>
@@ -216,6 +217,8 @@ namespace Core {
 using namespace Passenger::Core;
 
 static VariantMap *agentsOptions;
+static Schema *coreSchema;
+static ConfigKit::Store *coreConfig;
 static WorkingObjects *workingObjects;
 
 
@@ -243,19 +246,6 @@ initializePrivilegedWorkingObjects() {
 		wo->password.clear();
 	} else if (wo->password.empty() && options.has("core_password_file")) {
 		wo->password = strip(readAll(options.get("core_password_file")));
-	}
-
-	vector<string> authorizations = options.getStrSet("core_authorizations",
-		false);
-	string description;
-
-	UPDATE_TRACE_POINT();
-	foreach (description, authorizations) {
-		try {
-			wo->apiAccountDatabase.add(description);
-		} catch (const ArgumentException &e) {
-			throw std::runtime_error(e.what());
-		}
 	}
 }
 
@@ -762,22 +752,14 @@ initializeNonPrivilegedWorkingObjects() {
 		awo->serverKitContext->initialize();
 
 		UPDATE_TRACE_POINT();
-		Json::Value config;
-		if (options.has("instance_dir")) {
-			config["instance_dir"] = options.get("instance_dir");
-		}
-		if (options.has("watchdog_fd_passing_password")) {
-			config["fd_passing_password"] = options.get("watchdog_fd_passing_password");
-		}
-
 		awo->apiServer = new Core::ApiServer::ApiServer(awo->serverKitContext,
-			awo->schema, config);
+			coreSchema->apiServer.schema, coreConfig->inspectEffectiveValues(),
+			coreSchema->apiServer.translator);
 		awo->apiServer->controllers.reserve(wo->threadWorkingObjects.size());
 		for (unsigned int i = 0; i < wo->threadWorkingObjects.size(); i++) {
 			awo->apiServer->controllers.push_back(
 				wo->threadWorkingObjects[i].controller);
 		}
-		awo->apiServer->apiAccountDatabase = &wo->apiAccountDatabase;
 		awo->apiServer->appPool = wo->appPool;
 		awo->apiServer->exitEvent = &wo->exitEvent;
 		awo->apiServer->shutdownFinishCallback = apiServerShutdownFinished;
@@ -1441,8 +1423,11 @@ coreMain(int argc, char *argv[]) {
 	agentsOptions = new VariantMap();
 	*agentsOptions = initializeAgent(argc, &argv, SHORT_PROGRAM_NAME " core", parseOptions,
 		preinitialize, 2);
+
+	Json::Value coreConfigDoc = prepareCoreConfigFromAgentsOptions(*agentsOptions);
 	setAgentsOptionsDefaults();
 	sanityCheckOptions();
+	createCoreConfigFromAgentsOptions(*agentsOptions, coreConfigDoc, &coreConfig, &coreSchema);
 
 	restoreOomScore(agentsOptions);
 
