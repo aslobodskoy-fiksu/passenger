@@ -347,10 +347,6 @@
          "has_default_value" : "static",
          "type" : "unsigned integer"
       },
-      "api_server_secure_mode_password" : {
-         "secret" : true,
-         "type" : "string"
-      },
       "api_server_start_reading_after_accept" : {
          "default_value" : true,
          "has_default_value" : "static",
@@ -443,10 +439,6 @@
          "default_value" : 1024,
          "has_default_value" : "static",
          "type" : "unsigned integer"
-      },
-      "controller_secure_mode_password" : {
-         "secret" : true,
-         "type" : "string"
       },
       "controller_socket_backlog" : {
          "default_value" : 0,

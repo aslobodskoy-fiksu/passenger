@@ -80,7 +80,6 @@ namespace Core {
  *   api_server_mbuf_block_chunk_size                                unsigned integer   -          default(4096),read_only
  *   api_server_min_spare_clients                                    unsigned integer   -          default(0)
  *   api_server_request_freelist_limit                               unsigned integer   -          default(1024)
- *   api_server_secure_mode_password                                 string             -          secret
  *   api_server_start_reading_after_accept                           boolean            -          default(true)
  *   app_file_descriptor_ulimit                                      unsigned integer   -          -
  *   app_output_log_level                                            string             -          default("notice")
@@ -101,7 +100,6 @@ namespace Core {
  *   controller_mbuf_block_chunk_size                                unsigned integer   -          default(4096),read_only
  *   controller_min_spare_clients                                    unsigned integer   -          default(0)
  *   controller_request_freelist_limit                               unsigned integer   -          default(1024)
- *   controller_secure_mode_password                                 string             -          secret
  *   controller_socket_backlog                                       unsigned integer   -          default(0)
  *   controller_start_reading_after_accept                           boolean            -          default(true)
  *   controller_threads                                              unsigned integer   -          default
@@ -268,11 +266,11 @@ public:
 		controller.translator.finalize();
 		addSubSchema(controller.schema, controller.translator);
 		erase("thread_number");
-		erase("controller_secure_mode_password");
 
 		// Add subschema: controllerServerKit
 		controllerServerKit.translator.setPrefixAndFinalize("controller_");
 		addSubSchema(controllerServerKit.schema, controllerServerKit.translator);
+		erase("controller_secure_mode_password");
 
 		// Add subschema: securityUpdateChecker
 		securityUpdateChecker.translator.setPrefixAndFinalize("security_update_checker_");
