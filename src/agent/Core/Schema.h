@@ -304,7 +304,7 @@ public:
 
 		add("passenger_root", STRING_TYPE, REQUIRED | READ_ONLY);
 		add("password", ANY_TYPE, OPTIONAL | SECRET);
-		addWithDynamicDefault("controller_threads", UINT_TYPE, OPTIONAL, getDefaultThreads);
+		addWithDynamicDefault("controller_threads", UINT_TYPE, OPTIONAL | READ_ONLY, getDefaultThreads);
 		add("max_pool_size", INT_TYPE, OPTIONAL, DEFAULT_MAX_POOL_SIZE);
 		add("pool_idle_time", UINT_TYPE, OPTIONAL, Json::UInt(DEFAULT_POOL_IDLE_TIME));
 		add("pool_selfchecks", BOOL_TYPE, OPTIONAL, false);
@@ -315,6 +315,8 @@ public:
 		add("controller_cpu_affine", BOOL_TYPE, OPTIONAL, false);
 		add("security_update_checker_disabled", BOOL_TYPE, OPTIONAL, false);
 
+		// NOTE: double check OptionParser.h
+
 		//core_password -> password DONE
 		//core_password_file -> password DONE
 		//core_authorizations -> authorizations DONE
@@ -322,8 +324,46 @@ public:
 		//max_pool_size -> same DONE
 		//pool_idle_time -> same DONE
 		//selfchecks -> pool_selfchecks DONE
+		//user_switching
+		//default_user
+		//default_group
+		//max_preloader_idle_time
+		//force_max_concurrent_requests_per_process
+		//min_instances
+		//memory_limit
+		//environment
+		//app_type
+		//startup_file
+		//spawn_method
+		//load_shell_envvars
+		//concurrency_model
+		//app_thread_count
+		//multi_app
+		//friendly_error_pages
+		//max_requests
+		//max_request_time
+		//max_request_queue_size
+		//sticky_sessions
+		//sticky_sessions_cookie_name
+		//vary_turbocache_by_cookie
+		//turbocaching
+		//abort_websockets_on_process_shutdown
+		//default_ruby
+		//default_nodejs
+		//default_python
+		//meteor_app_settings
+		//app_file_descriptor_ulimit
+		//show_version_in_header
+		//graceful_exit
+		//benchmark_mode
+		//app_root
 		//
-		//core_threads -> controller_threads
+		//core_log_level
+		//core_log_file
+		//core_file_descriptor_log_file
+		//stat_throttle_rate
+		//core_threads -> controller_threads DONE
+		//core_file_descriptor_ulimit
 		//
 		//disable_security_update_check -> security_update_checker_disabled
 		//security_update_check_proxy -> security_update_checker_proxy_url
@@ -332,11 +372,15 @@ public:
 		//
 		//prestart_urls -> same
 		//
+		//core_pid_file
 		//core_addresses -> controller_addresses
 		//core_api_addresses -> api_server_addreses
 		//socket_backlog -> controller_socket_backlog
-		//file_buffer_threshold -> (api_server|controller)_file_buffered_channel_threshold
+		//data_buffer_dir -> *_file_buffered_channel_buffer_dir DONE
+		//file_buffer_threshold -> (api_server|controller)_file_buffered_channel_threshold DONE
 		//core_cpu_affine -> controller_cpu_affine
+		//
+		//admin_panel_url
 		//
 		//concurrency_model
 		//app_thread_count
@@ -388,6 +432,19 @@ prepareCoreConfigFromAgentsOptions(const VariantMap &options) {
 	}
 	if (options.has("selfchecks")) {
 		config["pool_selfchecks"] = options.getBool("selfchecks");
+	}
+
+	if (options.has("core_threads")) {
+		config["controller_threads"] = options.getUint("core_threads");
+	}
+
+	if (options.has("data_buffer_dir")) {
+		config["controller_file_buffered_channel_buffer_dir"] = options.get("data_buffer_dir");
+		config["api_server_file_buffered_channel_buffer_dir"] = options.get("data_buffer_dir");
+	}
+	if (options.has("file_buffer_threshold")) {
+		config["api_server_file_buffered_channel_threshold"] = options.get("file_buffer_threshold");
+		config["controller_file_buffered_channel_threshold"] = options.get("file_buffer_threshold");
 	}
 
 	return config;

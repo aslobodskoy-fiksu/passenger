@@ -121,7 +121,6 @@ namespace Core {
 	struct ApiWorkingObjects {
 		BackgroundEventLoop *bgloop;
 		ServerKit::Context *serverKitContext;
-		ApiServer::Schema schema;
 		ApiServer::ApiServer *apiServer;
 
 		ApiWorkingObjects()
@@ -160,7 +159,6 @@ namespace Core {
 		PoolPtr appPool;
 
 		ServerKit::AcceptLoadBalancer<Controller> loadBalancer;
-		ServerKit::Schema serverKitSchema;
 		ControllerSchema controllerSchema;
 		vector<ThreadWorkingObjects> threadWorkingObjects;
 		struct ev_signal sigintWatcher;
@@ -678,19 +676,15 @@ initializeNonPrivilegedWorkingObjects() {
 	wo->appPool->abortLongRunningConnectionsCallback = abortLongRunningConnections;
 
 	UPDATE_TRACE_POINT();
-	unsigned int nthreads = options.getInt("core_threads");
+	unsigned int nthreads = coreConfig->get("controller_threads").asUInt();
 	BackgroundEventLoop *firstLoop = NULL; // Avoid compiler warning
 	wo->threadWorkingObjects.reserve(nthreads);
 	for (unsigned int i = 0; i < nthreads; i++) {
 		UPDATE_TRACE_POINT();
 		ThreadWorkingObjects two;
 
-		Json::Value contextConfig;
+		Json::Value contextConfig = coreConfig->inspectEffectiveValues();
 		contextConfig["secure_mode_password"] = wo->password;
-		contextConfig["file_buffered_channel_buffer_dir"] =
-			options.get("data_buffer_dir");
-		contextConfig["file_buffered_channel_threshold"] =
-			options.getUint("file_buffer_threshold");
 
 		Json::Value controllerConfig = ConfigKit::variantMapToJson(wo->controllerSchema,
 			*agentsOptions);
@@ -706,7 +700,9 @@ initializeNonPrivilegedWorkingObjects() {
 
 		UPDATE_TRACE_POINT();
 		two.serverKitContext = new ServerKit::Context(
-			wo->serverKitSchema, contextConfig);
+			coreSchema->controllerServerKit.schema,
+			contextConfig,
+			coreSchema->controllerServerKit.translator);
 		two.serverKitContext->libev = two.bgloop->safe;
 		two.serverKitContext->libuv = two.bgloop->libuv_loop;
 		two.serverKitContext->initialize();
@@ -737,16 +733,14 @@ initializeNonPrivilegedWorkingObjects() {
 		UPDATE_TRACE_POINT();
 		ApiWorkingObjects *awo = &wo->apiWorkingObjects;
 
-		Json::Value contextConfig;
+		Json::Value contextConfig = coreConfig->inspectEffectiveValues();
 		contextConfig["secure_mode_password"] = wo->password;
-		contextConfig["file_buffered_channel_buffer_dir"] =
-			options.get("data_buffer_dir");
-		contextConfig["file_buffered_channel_threshold"] =
-			options.getUint("file_buffer_threshold");
 
 		awo->bgloop = new BackgroundEventLoop(true, true);
 		awo->serverKitContext = new ServerKit::Context(
-			wo->serverKitSchema, contextConfig);
+			coreSchema->apiServerKit.schema,
+			contextConfig,
+			coreSchema->apiServerKit.translator);
 		awo->serverKitContext->libev = awo->bgloop->safe;
 		awo->serverKitContext->libuv = awo->bgloop->libuv_loop;
 		awo->serverKitContext->initialize();
