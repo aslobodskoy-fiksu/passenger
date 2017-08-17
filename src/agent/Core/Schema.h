@@ -315,55 +315,57 @@ public:
 		add("controller_cpu_affine", BOOL_TYPE, OPTIONAL, false);
 		add("security_update_checker_disabled", BOOL_TYPE, OPTIONAL, false);
 
-		// NOTE: double check OptionParser.h
+		// TODO: doublecheck whether all schema entries have a corresponding option entry
 
 		//core_password -> password DONE
 		//core_password_file -> password DONE
 		//core_authorizations -> authorizations DONE
+		//integration_mode -> same DONE
+		//builtin_engine -> same DONE
+		//passenger_root -> same DONE
 		//
 		//max_pool_size -> same DONE
 		//pool_idle_time -> same DONE
 		//selfchecks -> pool_selfchecks DONE
-		//user_switching
-		//default_user
-		//default_group
-		//max_preloader_idle_time
-		//force_max_concurrent_requests_per_process
-		//min_instances
-		//memory_limit
-		//environment
-		//app_type
-		//startup_file
-		//spawn_method
-		//load_shell_envvars
-		//concurrency_model
-		//app_thread_count
-		//multi_app
-		//friendly_error_pages
-		//max_requests
+		//user_switching -> same
+		//default_user -> same
+		//default_group -> same
+		//max_preloader_idle_time -> same
+		//force_max_concurrent_requests_per_process -> same
+		//min_instances -> same
+		//environment -> same
+		//app_type -> same
+		//startup_file -> same
+		//spawn_method -> same
+		//load_shell_envvars -> same
+		//multi_app -> same
+		//friendly_error_pages -> same
+		//max_requests (note: the option parser entry does not do anything) --- per-request option
 		//max_request_time
-		//max_request_queue_size
-		//sticky_sessions
-		//sticky_sessions_cookie_name
-		//vary_turbocache_by_cookie
-		//turbocaching
-		//abort_websockets_on_process_shutdown
-		//default_ruby
-		//default_nodejs
-		//default_python
-		//meteor_app_settings
-		//app_file_descriptor_ulimit
-		//show_version_in_header
-		//graceful_exit
-		//benchmark_mode
-		//app_root
-		//
-		//core_log_level
-		//core_log_file
-		//core_file_descriptor_log_file
-		//stat_throttle_rate
-		//core_threads -> controller_threads DONE
-		//core_file_descriptor_ulimit
+		//max_request_queue_size -> same
+		//sticky_sessions -> same
+		//sticky_sessions_cookie_name -> same
+		//vary_turbocache_by_cookie -> same
+		//turbocaching -> same
+		//abort_websockets_on_process_shutdown -> same
+		//default_ruby -> same
+		//default_nodejs -> same
+		//default_python -> same
+		//meteor_app_settings -> same
+		//app_file_descriptor_ulimit -> same
+		//show_version_in_header -> same
+		//graceful_exit -> same
+		//benchmark_mode -> same
+		//app_root -> same
+		//default_server_name -> same
+		//default_server_port -> same
+		//server_software -> same
+		//response_buffer_high_watermark -> same
+		//accept_burst_count -> (api_server|controller)_accept_burst_count
+		//client_freelist_limit -> (api_server|controller)_client_freelist_limit
+		//min_spare_clients -> (api_server|controller)_min_spare_clients
+		//request_freelist_limit -> (api_server|controller)_request_freelist_limit
+		//start_reading_after_accept -> (api_server|controller)_start_reading_after_accept
 		//
 		//disable_security_update_check -> security_update_checker_disabled
 		//security_update_check_proxy -> security_update_checker_proxy_url
@@ -372,6 +374,12 @@ public:
 		//
 		//prestart_urls -> same
 		//
+		//core_log_level
+		//core_log_file
+		//core_file_descriptor_log_file
+		//stat_throttle_rate -> same
+		//core_threads -> controller_threads DONE
+		//core_file_descriptor_ulimit
 		//core_pid_file
 		//core_addresses -> controller_addresses
 		//core_api_addresses -> api_server_addreses
@@ -379,12 +387,15 @@ public:
 		//data_buffer_dir -> *_file_buffered_channel_buffer_dir DONE
 		//file_buffer_threshold -> (api_server|controller)_file_buffered_channel_threshold DONE
 		//core_cpu_affine -> controller_cpu_affine
+		//ust_router_address -> same
+		//ust_router_password -> same
 		//
 		//admin_panel_url
 		//
 		//concurrency_model
 		//app_thread_count
 		//rolling_restarts
+		//memory_limit
 		//resist_deployment_errors
 		//debugger
 
