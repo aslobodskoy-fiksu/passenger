@@ -68,6 +68,15 @@ private:
 		return getSystemTempDir();
 	}
 
+	static Json::Value normalize(const Json::Value &effectiveValues) {
+		Json::Value updates;
+
+		updates["file_buffered_channel_buffer_dir"] = absolutizePath(
+			effectiveValues["file_buffered_channel_buffer_dir"].asString());
+
+		return updates;
+	}
+
 public:
 	Schema() {
 		using namespace ConfigKit;
@@ -85,6 +94,8 @@ public:
 		add("mbuf_block_chunk_size", UINT_TYPE, OPTIONAL | READ_ONLY,
 			DEFAULT_MBUF_CHUNK_SIZE);
 		add("secure_mode_password", STRING_TYPE, OPTIONAL | SECRET);
+
+		addNormalizer(normalize);
 
 		finalize();
 	}

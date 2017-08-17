@@ -52,20 +52,6 @@ class Context {
 private:
 	ConfigKit::Store configStore;
 
-	static ConfigKit::Store &
-	normalizeConfig(ConfigKit::Store &config) {
-		Json::Value updates;
-		vector<ConfigKit::Error> errors;
-
-		updates["file_buffered_channel_buffer_dir"] =
-			absolutizePath(config["file_buffered_channel_buffer_dir"].asString());
-		if (!config.update(updates, errors)) {
-			P_BUG("Error normalizing ServerKit config: " << ConfigKit::toString(errors));
-		}
-
-		return config;
-	}
-
 public:
 	typedef ServerKit::ConfigChangeRequest ConfigChangeRequest;
 
@@ -80,7 +66,7 @@ public:
 	Context(const Schema &schema, const Json::Value &initialConfig = Json::Value())
 		: configStore(schema, initialConfig),
 		  libuv(NULL),
-		  config(normalizeConfig(configStore))
+		  config(configStore)
 		{ }
 
 	~Context() {
@@ -113,7 +99,6 @@ public:
 	{
 		req.configStore.reset(new ConfigKit::Store(configStore, updates, errors));
 		if (errors.empty()) {
-			normalizeConfig(*req.configStore);
 			req.config.reset(new Config(*req.configStore));
 		}
 		return errors.empty();
