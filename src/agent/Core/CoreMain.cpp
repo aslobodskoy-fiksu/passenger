@@ -672,9 +672,9 @@ initializeNonPrivilegedWorkingObjects() {
 	wo->spawningKitFactory = boost::make_shared<SpawningKit::Factory>(wo->spawningKitConfig);
 	wo->appPool = boost::make_shared<Pool>(wo->spawningKitFactory, agentsOptions);
 	wo->appPool->initialize();
-	wo->appPool->setMax(options.getInt("max_pool_size"));
-	wo->appPool->setMaxIdleTime(options.getInt("pool_idle_time") * 1000000ULL);
-	wo->appPool->enableSelfChecking(options.getBool("selfchecks"));
+	wo->appPool->setMax(coreConfig->get("max_pool_size").asInt());
+	wo->appPool->setMaxIdleTime(coreConfig->get("pool_idle_time").asInt() * 1000000ULL);
+	wo->appPool->enableSelfChecking(coreConfig->get("pool_selfchecks").asBool());
 	wo->appPool->abortLongRunningConnectionsCallback = abortLongRunningConnections;
 
 	UPDATE_TRACE_POINT();
