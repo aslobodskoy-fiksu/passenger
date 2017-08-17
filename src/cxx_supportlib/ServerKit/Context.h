@@ -69,6 +69,14 @@ public:
 		  config(configStore)
 		{ }
 
+	template<typename Translator>
+	Context(const Schema &schema, const Json::Value &initialConfig,
+		const Translator &translator)
+		: configStore(schema, initialConfig, translator),
+		  libuv(NULL),
+		  config(configStore)
+		{ }
+
 	~Context() {
 		MemoryKit::mbuf_pool_deinit(&mbuf_pool);
 	}
